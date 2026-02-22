@@ -4,7 +4,7 @@
   "description": "IPTV爬虫项目，用于自动抓取、管理和优化IPTV直播源",
   "main": "index.js",
   "scripts": {
-    "build": "echo '=== 开始构建 IPTV Spider ===' && python -m pip install --upgrade pip && python -m pip install wheel && python -m pip install lxml==4.9.4 --only-binary=lxml && python -m pip install -r requirements.txt && echo '=== 构建完成 ==='",
+    "build": "echo '=== 开始构建 IPTV Spider ===' && python -m pip install --upgrade pip && python -m pip install wheel && python -m pip install lxml --only-binary=lxml && python -m pip install -r requirements.txt && echo '=== 构建完成 ==='",
     "test": "python test_system.py",
     "start": "python main.py"
   },
