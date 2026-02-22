@@ -7,10 +7,18 @@ on:
       - main
       - staging
       - develop
+    paths-ignore:
+      - '**/*.md'
+      - '**/*.txt'
+      - 'source/**'
   pull_request:
     branches:
       - main
       - staging
+    paths-ignore:
+      - '**/*.md'
+      - '**/*.txt'
+      - 'source/**'
 
 jobs:
   build:
@@ -43,6 +51,9 @@ jobs:
           echo "Running build script..."
           echo "Checking if build cache is available..."
           ./build.sh
+        env:
+          NODE_ENV: production
+          BUILD_MODE: ${{ github.ref == 'refs/heads/main' ? 'production' : 'staging' }}
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -81,8 +92,16 @@ jobs:
           npm cache verify || echo "npm cache verification skipped"
           cd frontend && npm install --verbose
 
+      - name: Run frontend lint
+        run: |
+          echo "Running frontend lint..."
+          cd frontend && npm run lint
+
       - name: Run frontend tests
-        run: echo "Skipping frontend tests due to configuration issue"
+        run: |
+          echo "Running frontend tests..."
+          cd frontend && npm run test
+        continue-on-error: true
 
       - name: Install Python dependencies
         run: |
@@ -121,6 +140,13 @@ jobs:
           projectName: iptv-spider-staging
           directory: dist
           branch: staging
+          environment: staging
+
+      - name: Notify deployment status
+        if: success()
+        run: |
+          echo "Staging deployment completed successfully!"
+          echo "Frontend deployed to Cloudflare Pages staging environment"
 
   deploy-production:
     needs: [build, test]
@@ -145,9 +171,16 @@ jobs:
           projectName: spider-iptv
           directory: dist
           branch: main
+          environment: production
+
+      - name: Notify deployment status
+        if: success()
+        run: |
+          echo "Production deployment completed successfully!"
+          echo "Frontend deployed to Cloudflare Pages production environment"
 
   deploy-python-backend:
-    needs: [build, test, deploy-staging, deploy-production]
+    needs: [build, test]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging'
     
@@ -181,13 +214,18 @@ jobs:
           # Deploy to Vercel
           # Note: This requires VERCEL_TOKEN to be set in GitHub Secrets
           if [ -n "$VERCEL_TOKEN" ]; then
-            vercel --token $VERCEL_TOKEN --prod
+            if [ "$GITHUB_REF" == "refs/heads/main" ]; then
+              vercel --token $VERCEL_TOKEN --prod
+            else
+              vercel --token $VERCEL_TOKEN
+            fi
           else
             echo "VERCEL_TOKEN not set, skipping deployment"
             echo "To deploy to Vercel, set VERCEL_TOKEN in GitHub Secrets"
           fi
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          GITHUB_REF: ${{ github.ref }}
 
       - name: Run main.py script (initial crawl)
         run: |
@@ -228,3 +266,35 @@ jobs:
             echo "Info: Log file not found (using console output)"
           fi
 
+  notify:
+    needs: [deploy-staging, deploy-production, deploy-python-backend]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+      - name: Check deployment statuses
+        run: |
+          echo "Checking deployment statuses..."
+          echo "Build status: ${{ needs.build.result }}"
+          echo "Test status: ${{ needs.test.result }}"
+          echo "Staging deployment status: ${{ needs.deploy-staging.result }}"
+          echo "Production deployment status: ${{ needs.deploy-production.result }}"
+          echo "Backend deployment status: ${{ needs.deploy-python-backend.result }}"
+
+      - name: Send deployment notification
+        if: success()
+        run: |
+          echo "All deployments completed successfully!"
+          echo "Frontend deployed to Cloudflare Pages"
+          echo "Backend deployed to Vercel"
+          echo "Initial crawl completed"
+          echo "Deployment summary:"
+          echo "- Branch: ${{ github.ref_name }}"
+          echo "- Commit: ${{ github.sha }}"
+          echo "- Author: ${{ github.actor }}"
+          echo "- Timestamp: ${{ github.event.head_commit.timestamp }}"
+        env:
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_EVENT_HEAD_COMMIT_TIMESTAMP: ${{ github.event.head_commit.timestamp }}
