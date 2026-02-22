@@ -1,0 +1,59 @@
+{
+    "database": {
+        "path": "data/iptv.db"
+    },
+    "logging": {
+        "level": "INFO",
+        "file": "logs/iptv.log",
+        "max_bytes": 10485760,
+        "backup_count": 5
+    },
+    "crawler": {
+        "timeout": 30,
+        "retry_count": 3,
+        "retry_delay": 5,
+        "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "sources": [
+            {
+                "name": "iptv_im2k",
+                "url": "https://iptv.im2k.com/",
+                "enabled": true
+            },
+            {
+                "name": "北京联通",
+                "url": "https://iptv.im2k.com/bjuc.m3u",
+                "enabled": true
+            },
+            {
+                "name": "北京移动",
+                "url": "https://iptv.im2k.com/bjm.m3u",
+                "enabled": true
+            },
+            {
+                "name": "天津联通",
+                "url": "https://iptv.im2k.com/tjuc.m3u",
+                "enabled": true
+            },
+            {
+                "name": "天津移动",
+                "url": "https://iptv.im2k.com/tjm.m3u",
+                "enabled": true
+            },
+            {
+                "name": "m3u_ibert",
+                "url": "https://m3u.ibert.me/",
+                "enabled": true
+            }
+        ]
+    },
+    "scheduler": {
+        "download_interval": 24,
+        "check_interval": 6,
+        "cleanup_interval": 72
+    },
+    "validation": {
+        "timeout": 15,
+        "min_speed": 1.0,
+        "max_retries": 3
+    }
+}
