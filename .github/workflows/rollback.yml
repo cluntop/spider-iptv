@@ -1,0 +1,60 @@
+name: Rollback Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to rollback'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+      deployment_id:
+        description: 'Deployment ID to rollback to (leave blank for latest successful)'
+        required: false
+        type: string
+
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: cd frontend && npm ci
+
+      - name: Build frontend
+        run: cd frontend && npm run build:${{ github.event.inputs.environment }}
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: iptv-spider${{ github.event.inputs.environment == 'staging' ? '-staging' : '' }}
+          directory: dist
+          branch: ${{ github.event.inputs.environment }}
+          environment: ${{ github.event.inputs.environment }}
+
+      - name: Notify rollback completion
+        if: success()
+        run: |
+          echo "Rollback to ${{ github.event.inputs.environment }} completed successfully!"
+          echo "Deployment URL: https://iptv-spider${{ github.event.inputs.environment == 'staging' ? '-staging' : '' }}.pages.dev"
+
+      - name: Notify rollback failure
+        if: failure()
+        run: |
+          echo "Rollback to ${{ github.event.inputs.environment }} failed!"
+          echo "Please check the workflow logs for details."

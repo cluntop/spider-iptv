@@ -1,43 +1,38 @@
 // Cloudflare Pages 健康检查函数
-export async function onRequest(context) {
+import { log, handleApiError, createSuccessResponse } from '../utils/logger.js';
+import { withCors } from '../utils/cors.js';
+
+async function handler(context) {
   const { request, env, params, waitUntil } = context;
   
   try {
+    log('info', 'Health check requested', {
+      environment: env.CF_PAGES ? 'production' : 'development'
+    });
+    
     // 模拟数据库连接检查
     const dbStatus = await checkDatabaseStatus();
     
-    return new Response(
-      JSON.stringify({
-        status: "ok",
-        message: "IPTV Spider API is running",
-        timestamp: new Date().toISOString(),
-        database: dbStatus,
-        version: "1.0.0",
-        environment: env.CF_PAGES ? "production" : "development"
-      }),
-      {
-        headers: {
-          "content-type": "application/json"
-        }
-      }
-    );
+    const responseData = {
+      status: "ok",
+      message: "IPTV Spider API is running",
+      database: dbStatus,
+      version: "1.0.0",
+      environment: env.CF_PAGES ? "production" : "development"
+    };
+    
+    log('info', 'Health check completed successfully', {
+      databaseStatus: dbStatus.status
+    });
+    
+    return createSuccessResponse(responseData);
   } catch (error) {
-    return new Response(
-      JSON.stringify({
-        status: "error",
-        message: "Health check failed",
-        error: error.message,
-        timestamp: new Date().toISOString()
-      }),
-      {
-        status: 500,
-        headers: {
-          "content-type": "application/json"
-        }
-      }
-    );
+    return handleApiError(error, context, 'Health check failed');
   }
 }
+
+// Export wrapped handler with CORS support
+export const onRequest = withCors(handler);
 
 // 检查数据库状态
 async function checkDatabaseStatus() {
@@ -50,6 +45,7 @@ async function checkDatabaseStatus() {
       last_check: new Date().toISOString()
     };
   } catch (error) {
+    log('warn', 'Database connection check failed', {}, error);
     return {
       status: "disconnected",
       error: error.message,
