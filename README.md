@@ -81,8 +81,8 @@ iptv-spider/
 
 1. **克隆项目**
    ```bash
-   git clone https://github.com/cluntop/iptv-spider.git
-   cd iptv-spider
+   git clone https://github.com/cluntop/spider-iptv.git
+   cd spider-iptv
    ```
 
 2. **安装依赖**
