@@ -1,0 +1,10 @@
+# API 路由 - 保持原样
+/api/* /api/:splat 200
+
+# 静态资源 - 保持原样
+/assets/* /assets/:splat 200
+/chunks/* /chunks/:splat 200
+/entry/* /entry/:splat 200
+
+# 单页应用路由 - 重定向到 index.html
+/* /index.html 200

@@ -1,0 +1,465 @@
+/* 全局样式 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f0f2f5;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* 应用容器 */
+.app-container {
+  min-height: 100vh;
+}
+
+/* 加载容器 */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-size: 18px;
+  color: #1890ff;
+}
+
+/* 页面容器 */
+.dashboard-container,
+.user-management-container,
+.channel-management-container,
+.system-settings-container,
+.statistics-container {
+  padding: 24px;
+  background-color: #f0f2f5;
+  min-height: 100vh;
+}
+
+/* 页面标题 */
+h1 {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 24px;
+  color: #262626;
+}
+
+/* 卡片样式 */
+.ant-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.ant-card-head {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.ant-card-body {
+  padding: 20px;
+}
+
+/* 表格样式 */
+.ant-table {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.ant-table-thead > tr > th {
+  background-color: #fafafa;
+  font-weight: 600;
+}
+
+.ant-table-tbody > tr:hover {
+  background-color: #f5f5f5;
+}
+
+/* 按钮样式 */
+.ant-btn {
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.ant-btn-primary {
+  background-color: #1890ff;
+  border-color: #1890ff;
+}
+
+.ant-btn-primary:hover {
+  background-color: #40a9ff;
+  border-color: #40a9ff;
+}
+
+/* 表单样式 */
+.ant-form-item-label {
+  font-weight: 500;
+}
+
+.ant-input {
+  border-radius: 4px;
+}
+
+.ant-select {
+  border-radius: 4px;
+}
+
+/* 菜单样式 */
+.ant-menu {
+  border-radius: 0;
+}
+
+.ant-menu-dark {
+  background-color: #001529;
+}
+
+.ant-menu-dark .ant-menu-item-selected {
+  background-color: #1890ff;
+}
+
+/* 布局样式 */
+.ant-layout {
+  min-height: 100vh;
+}
+
+.ant-layout-sider {
+  border-right: 1px solid #f0f0f0;
+}
+
+.ant-layout-content {
+  background-color: #f0f2f5;
+}
+
+/* 头部样式 */
+.ant-layout-header {
+  background-color: #fff;
+  border-bottom: 1px solid #f0f0f0;
+  padding: 0 24px;
+}
+
+/* 徽章样式 */
+.ant-badge {
+  font-size: 12px;
+}
+
+/* 标签样式 */
+.ant-tag {
+  border-radius: 4px;
+}
+
+/* 分页样式 */
+.ant-pagination {
+  margin-top: 16px;
+  text-align: right;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .dashboard-container,
+  .user-management-container,
+  .channel-management-container,
+  .system-settings-container,
+  .statistics-container {
+    padding: 16px;
+  }
+
+  h1 {
+    font-size: 20px;
+  }
+
+  .ant-card-body {
+    padding: 16px;
+  }
+
+  .ant-layout-header {
+    padding: 0 16px;
+  }
+
+  .ant-layout-content {
+    padding: 16px;
+  }
+}
+
+/* 动画效果 */
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 加载动画 */
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 48px 0;
+  color: #999;
+}
+
+.empty-state-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.empty-state-text {
+  font-size: 16px;
+}
+
+/* 搜索框样式 */
+.search-input {
+  width: 200px;
+}
+
+/* 批量操作按钮 */
+.batch-actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+/* 登录页面样式 */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.login-card {
+  width: 400px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background-color: #fff;
+  border-radius: 8px;
+}
+
+.login-button {
+  width: 100%;
+}
+
+/* 统计卡片样式 */
+.stat-card {
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* 图表容器 */
+.chart-container {
+  height: 300px;
+  width: 100%;
+}
+
+/* 响应式表格 */
+.responsive-table {
+  overflow-x: auto;
+}
+
+/* 权限不足提示 */
+.permission-denied {
+  padding: 48px 0;
+  text-align: center;
+  color: #999;
+}
+
+/* 系统设置表单 */
+.settings-form {
+  max-width: 800px;
+}
+
+/* 上传组件 */
+.ant-upload-dragger {
+  border-radius: 8px;
+  border: 2px dashed #d9d9d9;
+}
+
+.ant-upload-dragger:hover {
+  border-color: #1890ff;
+}
+
+/* 时间选择器 */
+.ant-picker {
+  border-radius: 4px;
+}
+
+/* 开关组件 */
+.ant-switch {
+  border-radius: 16px;
+}
+
+/* 滑块组件 */
+.ant-slider {
+  margin: 16px 0;
+}
+
+/* 标签选择器 */
+.ant-tag-select {
+  border-radius: 4px;
+}
+
+/* 工具提示 */
+.ant-tooltip {
+  font-size: 12px;
+}
+
+/* 消息提示 */
+.ant-message {
+  font-size: 14px;
+}
+
+/* 通知 */
+.ant-notification {
+  font-size: 14px;
+}
+
+/* 模态框 */
+.ant-modal {
+  border-radius: 8px;
+}
+
+.ant-modal-header {
+  border-bottom: 1px solid #f0f0f0;
+  border-radius: 8px 8px 0 0;
+}
+
+.ant-modal-footer {
+  border-top: 1px solid #f0f0f0;
+  border-radius: 0 0 8px 8px;
+}
+
+/* 抽屉 */
+.ant-drawer {
+  border-radius: 8px 0 0 8px;
+}
+
+.ant-drawer-header {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.ant-drawer-footer {
+  border-top: 1px solid #f0f0f0;
+}
+
+/* 步骤条 */
+.ant-steps {
+  margin-bottom: 24px;
+}
+
+/* 分割线 */
+.ant-divider {
+  margin: 20px 0;
+}
+
+/* 面包屑 */
+.ant-breadcrumb {
+  margin-bottom: 16px;
+}
+
+/* 进度条 */
+.ant-progress {
+  margin-bottom: 16px;
+}
+
+/* 徽章 */
+.ant-badge {
+  margin-right: 8px;
+}
+
+/* 头像 */
+.ant-avatar {
+  margin-right: 8px;
+}
+
+/* 速率限制 */
+.rate-limit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 响应式网格 */
+.responsive-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+/* 卡片组 */
+.card-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+/* 卡片项 */
+.card-item {
+  flex: 1 1 240px;
+  min-width: 240px;
+}
+
+/* 卡片头部 */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+/* 卡片标题 */
+.card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #262626;
+}
+
+/* 卡片操作 */
+.card-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* 卡片内容 */
+.card-content {
+  margin-bottom: 16px;
+}
+
+/* 卡片底部 */
+.card-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+}

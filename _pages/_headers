@@ -1,0 +1,20 @@
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/chunks/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/entry/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/api/*
+  Cache-Control: no-cache, no-store, must-revalidate
+  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
+  Access-Control-Allow-Headers: Content-Type, Authorization
