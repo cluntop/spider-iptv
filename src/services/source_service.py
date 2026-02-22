@@ -23,13 +23,15 @@ class SourceService:
         # 数据源配置
         self.data_sources = {
             'network': [
+                {'url': 'https://clun.top/lib/iptv.m3u', 'path': 'source/download/iptv.m3u', 'type': 'm3u'},
+                {'url': 'https://clun.top/lib/iptv_test.m3u', 'path': 'source/download/iptv_test.m3u', 'type': 'm3u'},
                 {'url': 'https://m3u.ibert.me/txt/o_s_cn_cgtn.txt', 'path': 'source/download/o_s_cn_cgtn.txt', 'type': 'txt'},
                 {'url': 'https://iptv.im2k.com/bjuc.m3u', 'path': 'source/download/北京-联通-239.3.1.m3u', 'type': 'm3u'},
                 {'url': 'https://iptv.im2k.com/tjuc.m3u', 'path': 'source/multicast/天津-联通-225.1.1.m3u', 'type': 'm3u'},
-                {'url': 'http://github.taoiptv.com/https://raw.githubusercontent.com/qwerttvv/Beijing-IPTV/master/IPTV-Mobile-Multicast.m3u', 'path': 'source/multicast/北京-移动-228.1.1.m3u', 'type': 'm3u'},
-                {'url': 'http://github.taoiptv.com/https://raw.githubusercontent.com/qwerttvv/Beijing-IPTV/master/IPTV-Unicom-Multicast.m3u', 'path': 'source/multicast/北京-联通-239.3.1.m3u', 'type': 'm3u'},
-                {'url': 'http://github.taoiptv.com/https://raw.githubusercontent.com/akumajac/hebei-iptv/main/%E7%BB%84%E6%92%AD.txt', 'path': 'source/multicast/河北-电信-239.254.200.txt', 'type': 'txt'},
-                {'url': 'http://github.taoiptv.com/https://raw.githubusercontent.com/Tzwcard/ChinaTelecom-GuangdongIPTV-RTP-List/master/GuangdongIPTV_rtp_hd.m3u', 'path': 'source/multicast/广东-电信-239.77.1.m3u', 'type': 'm3u'}
+                {'url': 'https://raw.githubusercontent.com/qwerttvv/Beijing-IPTV/master/IPTV-Mobile-Multicast.m3u', 'path': 'source/multicast/北京-移动-228.1.1.m3u', 'type': 'm3u'},
+                {'url': 'https://raw.githubusercontent.com/qwerttvv/Beijing-IPTV/master/IPTV-Unicom-Multicast.m3u', 'path': 'source/multicast/北京-联通-239.3.1.m3u', 'type': 'm3u'},
+                {'url': 'https://raw.githubusercontent.com/akumajac/hebei-iptv/main/%E7%BB%84%E6%92%AD.txt', 'path': 'source/multicast/河北-电信-239.254.200.txt', 'type': 'txt'},
+                {'url': 'https://raw.githubusercontent.com/Tzwcard/ChinaTelecom-GuangdongIPTV-RTP-List/master/GuangdongIPTV_rtp_hd.m3u', 'path': 'source/multicast/广东-电信-239.77.1.m3u', 'type': 'm3u'}
             ],
             'special': [
                 {'name': 'sichuan_multicast', 'url': 'http://epg.51zmt.top:8000/sctvmulticast.html', 'path': 'source/multicast/四川-电信-239.93.0.txt'},
