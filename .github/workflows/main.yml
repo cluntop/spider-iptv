@@ -1,6 +1,9 @@
 name: Main.py Execution and Sync
 
 on:
+  schedule:
+    # 每隔2小时执行一次
+    - cron: '0 */2 * * *'
   push:
     branches:
       - main
