@@ -1,20 +1,39 @@
-name: Scheduled Main.py Execution
+name: Main.py Execution and Sync
 
 on:
-  schedule:
-    # 每隔2小时执行一次
-    - cron: '0 */2 * * *'
+  push:
+    branches:
+      - main
+      - staging
+      - develop
+    paths-ignore:
+      - '**/*.md'
+      - '**/*.txt'
+      - 'source/**'
+  pull_request:
+    branches:
+      - main
+      - staging
+    paths-ignore:
+      - '**/*.md'
+      - '**/*.txt'
+      - 'source/**'
   workflow_dispatch:
     # 允许手动触发
 
 jobs:
-  run-main:
+  run-main-and-sync:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    
+    permissions:
+      contents: write
+      pull-requests: write
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -46,6 +65,7 @@ jobs:
           done
 
       - name: Execute main.py with error handling
+        id: execute-main
         run: |
           echo "Executing main.py..."
           echo "Python version: $(python --version)"
@@ -56,11 +76,13 @@ jobs:
           # Run main.py with error handling
           if python main.py; then
             echo "main.py executed successfully!"
+            echo "execution-status=success" >> $GITHUB_OUTPUT
           else
             echo "Error: main.py execution failed"
             echo "Capturing error details..."
             # 重新运行以获取详细错误信息
             python main.py || true
+            echo "execution-status=failure" >> $GITHUB_OUTPUT
             exit 1
           fi
 
@@ -74,7 +96,7 @@ jobs:
           # 检查生成的文件
           if [ -f "playlist.m3u" ]; then
             echo "Playlist generated: $(ls -la playlist.m3u)"
-            echo "First 15 lines of playlist:"
+            echo "First 15 lines of playlist:" 
             head -n 15 playlist.m3u
           else
             echo "Warning: Playlist file not found"
@@ -89,6 +111,51 @@ jobs:
             echo "Info: Log file not found"
           fi
 
+      - name: Detect file changes
+        id: detect-changes
+        if: steps.execute-main.outputs.execution-status == 'success'
+        run: |
+          echo "Detecting file changes..."
+          # 检查是否有文件变更
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          
+          # 检查变更
+          CHANGED_FILES=$(git status --porcelain)
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+          
+          if [ -z "$CHANGED_FILES" ]; then
+            echo "No files changed."
+            echo "has-changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "Files changed detected."
+            echo "has-changes=true" >> $GITHUB_OUTPUT
+            # 输出变更的文件列表
+            echo "changed-files=$(echo "$CHANGED_FILES" | wc -l)" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and push changes
+        if: steps.detect-changes.outputs.has-changes == 'true'
+        run: |
+          echo "Committing and pushing changes..."
+          # 添加所有变更的文件
+          git add .
+          
+          # 创建提交消息
+          COMMIT_MESSAGE="Auto-sync: Updated files after main.py execution"
+          
+          # 提交变更
+          if git commit -m "$COMMIT_MESSAGE"; then
+            echo "Commit successful!"
+            # 推送变更
+            git push origin HEAD:${{ github.ref }}
+            echo "Push successful!"
+          else
+            echo "Error: Commit failed"
+            exit 1
+          fi
+
       - name: Send notification on failure
         if: failure()
         run: |
@@ -98,7 +165,6 @@ jobs:
           echo "GitHub Run URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           
           # 这里可以添加更复杂的通知机制，比如发送邮件或使用webhook
-          # 例如使用GitHub的通知功能或第三方服务
           echo "Notification would be sent here in a production environment"
 
       - name: Clean up
