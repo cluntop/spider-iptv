@@ -47,7 +47,7 @@ python -m pip install wheel
 
 # 安装 lxml 的预编译包 - 强制使用二进制包
 echo "安装 lxml 预编译包..."
-python -m pip install lxml==4.9.4 --only-binary=:all: --no-cache-dir
+python -m pip install lxml --only-binary=lxml --no-cache-dir
 
 # 检查 lxml 是否安装成功
 echo "检查 lxml 安装..."
