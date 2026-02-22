@@ -93,7 +93,7 @@ echo "=== 验证构建输出 ==="
 echo "构建输出目录结构:"
 ls -la dist/
 if [ -d "dist/functions" ]; then
-    echo "\nCloudflare Functions:"
+    echo "Cloudflare Functions:"
     ls -la dist/functions/
 fi
 

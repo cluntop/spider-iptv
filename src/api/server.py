@@ -162,6 +162,70 @@ async def delete_channel(channel_id: int):
     
     raise HTTPException(status_code=404, detail="Channel not found")
 
+# Run spider endpoint
+@app.post("/api/run-spider", response_model=dict)
+async def run_spider():
+    """Run the main.py script"""
+    import subprocess
+    import json
+    import os
+    
+    logger.info("Running main.py script")
+    
+    try:
+        # Change to project root directory
+        os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        
+        # Run the main.py script with initial crawl flag
+        result = subprocess.run(
+            ["python", "main.py", "--initial-crawl"],
+            capture_output=True,
+            text=True,
+            timeout=300  # 5 minutes timeout
+        )
+        
+        logger.info(f"Spider execution completed with return code: {result.returncode}")
+        logger.debug(f"Spider stdout: {result.stdout}")
+        if result.stderr:
+            logger.warning(f"Spider stderr: {result.stderr}")
+        
+        # Check if playlist was generated
+        playlist_exists = os.path.exists("playlist.m3u")
+        playlist_size = os.path.getsize("playlist.m3u") if playlist_exists else 0
+        
+        return {
+            "success": result.returncode == 0,
+            "message": "Spider run completed successfully" if result.returncode == 0 else "Spider run failed",
+            "returnCode": result.returncode,
+            "stdout": result.stdout,
+            "stderr": result.stderr,
+            "playlistGenerated": playlist_exists,
+            "playlistSize": playlist_size,
+            "executionTime": "Completed"
+        }
+    except subprocess.TimeoutExpired:
+        logger.error("Spider execution timed out after 5 minutes")
+        return {
+            "success": False,
+            "message": "Spider execution timed out after 5 minutes",
+            "stdout": "",
+            "stderr": "Execution timeout",
+            "playlistGenerated": False,
+            "playlistSize": 0,
+            "executionTime": "5 minutes"
+        }
+    except Exception as e:
+        logger.error(f"Error running spider: {e}")
+        return {
+            "success": False,
+            "message": f"Error running spider: {str(e)}",
+            "stdout": "",
+            "stderr": str(e),
+            "playlistGenerated": False,
+            "playlistSize": 0,
+            "executionTime": "Error"
+        }
+
 # Run the server
 if __name__ == "__main__":
     logger.info("Starting IPTV Spider API server")

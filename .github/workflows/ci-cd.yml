@@ -128,7 +128,7 @@ jobs:
           branch: main
 
   deploy-python-backend:
-    needs: [build, test]
+    needs: [build, test, deploy-staging, deploy-production]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging'
     
@@ -142,14 +142,68 @@ jobs:
           python-version: '3.10'
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
-
-      - name: Deploy Python backend
         run: |
-          # 这里添加Python后端部署命令
-          # 例如部署到Vercel Serverless, AWS Lambda等
-          echo "Python backend deployment placeholder"
-          echo "In production, this would deploy to a Python-compatible serverless platform"
-          echo "Backend files are ready for deployment:"
-          ls -la src/api/
+          # 升级 pip
+          python -m pip install --upgrade pip
+          # 安装 wheel 以支持预编译包
+          python -m pip install wheel
+          # 安装 lxml 的预编译包
+          python -m pip install lxml --only-binary=lxml
+          # 安装其他依赖
+          python -m pip install -r requirements.txt
+
+      - name: Deploy Python backend to Vercel
+        run: |
+          # Install Vercel CLI
+          npm install -g vercel
+          
+          # Deploy to Vercel
+          # Note: This requires VERCEL_TOKEN to be set in GitHub Secrets
+          if [ -n "$VERCEL_TOKEN" ]; then
+            vercel --token $VERCEL_TOKEN --prod
+          else
+            echo "VERCEL_TOKEN not set, skipping deployment"
+            echo "To deploy to Vercel, set VERCEL_TOKEN in GitHub Secrets"
+          fi
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+      - name: Run main.py script (initial crawl)
+        run: |
+          # 验证 Python 环境
+          echo "Python version: $(python --version)"
+          echo "Python path: $(which python)"
+          
+          # 检查依赖项
+          echo "Checking dependencies..."
+          python -c "import requests; print('requests:', requests.__version__)"
+          python -c "import bs4; print('beautifulsoup4:', bs4.__version__)"
+          python -c "import lxml; print('lxml:', lxml.__version__)"
+          
+          # Run the main.py script to perform initial crawl
+          # This will download sources, process channels, and generate playlists
+          echo "Running initial IPTV spider crawl..."
+          python main.py --initial-crawl
+        continue-on-error: true
+
+      - name: Check script execution results
+        run: |
+          # 检查脚本执行日志和输出文件
+          echo "Checking script execution results..."
+          if [ -f "playlist.m3u" ]; then
+            echo "Playlist generated successfully: $(ls -la playlist.m3u)"
+            echo "First 10 lines of playlist:"
+            head -n 10 playlist.m3u
+          else
+            echo "Warning: Playlist file not found"
+          fi
+          
+          # 检查日志文件
+          if [ -f "iptv_spider.log" ]; then
+            echo "Log file found: $(ls -la iptv_spider.log)"
+            echo "Last 20 lines of log:"
+            tail -n 20 iptv_spider.log
+          else
+            echo "Info: Log file not found (using console output)"
+          fi
 

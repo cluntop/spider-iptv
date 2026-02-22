@@ -31,28 +31,32 @@ jobs:
           cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
 
-      - name: Install dependencies
-        run: cd frontend && npm ci
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
 
-      - name: Build frontend
-        run: cd frontend && npm run build:${{ github.event.inputs.environment }}
+      - name: Make build script executable
+        run: chmod +x build.sh
+
+      - name: Run build script
+        run: ./build.sh
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/pages-action@v1
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: iptv-spider${{ github.event.inputs.environment == 'staging' ? '-staging' : '' }}
-          directory: frontend/dist
+          projectName: ${{ github.event.inputs.environment == 'staging' && 'iptv-spider-staging' || 'iptv-spider' }}
+          directory: dist
           branch: ${{ github.event.inputs.environment == 'production' && 'main' || github.event.inputs.environment }}
 
       - name: Notify rollback completion
-
         if: success()
         run: |
           echo "Rollback to ${{ github.event.inputs.environment }} completed successfully!"
-
-          echo "Deployment URL: https://iptv-spider${{ github.event.inputs.environment == 'staging' ? '-staging' : '' }}.pages.dev"
+          echo "Deployment URL: https://${{ github.event.inputs.environment == 'staging' && 'iptv-spider-staging' || 'iptv-spider' }}.pages.dev"
 
       - name: Notify rollback failure
         if: failure()

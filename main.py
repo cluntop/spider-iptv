@@ -195,18 +195,17 @@ class IPTVSpider:
         else:
             logger.warning("IPTV播放列表生成失败")
 
+import sys
+
 if __name__ == "__main__":
     try:
+        # 检查是否为初始爬取模式
+        initial_crawl = "--initial-crawl" in sys.argv
+        
         # 初始化数据库
         print("正在初始化数据库...")
         db = get_db()
         print("数据库初始化完成")
-        
-        # 启动数据库健康检查
-        from src.services.db_health import DatabaseHealthChecker
-        health_checker = DatabaseHealthChecker()
-        health_checker.start()
-        print("数据库健康检查已启动")
         
         # 运行爬虫
         print("正在运行IPTV爬虫...")
@@ -214,16 +213,25 @@ if __name__ == "__main__":
         spider.run()
         print("IPTV爬虫运行完成")
         
-        # 启动调度器
-        from src.services.scheduler import Scheduler
-        scheduler = Scheduler()
-        scheduler.start()
-        print("自动调度器已启动")
-        
-        # 保持程序运行
-        print("程序已启动，按 Ctrl+C 退出...")
-        while True:
-            time.sleep(1)
+        if not initial_crawl:
+            # 启动数据库健康检查
+            from src.services.db_health import DatabaseHealthChecker
+            health_checker = DatabaseHealthChecker()
+            health_checker.start()
+            print("数据库健康检查已启动")
+            
+            # 启动调度器
+            from src.services.scheduler import Scheduler
+            scheduler = Scheduler()
+            scheduler.start()
+            print("自动调度器已启动")
+            
+            # 保持程序运行
+            print("程序已启动，按 Ctrl+C 退出...")
+            while True:
+                time.sleep(1)
+        else:
+            print("初始爬取完成，程序退出")
     except KeyboardInterrupt:
         print("\n程序被用户中断")
         try:
