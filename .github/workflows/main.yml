@@ -77,14 +77,14 @@ jobs:
           ls -la main.py
           
           # Run main.py with error handling
-          if python main.py; then
+          if python main.py --initial-crawl; then
             echo "main.py executed successfully!"
             echo "execution-status=success" >> $GITHUB_OUTPUT
           else
             echo "Error: main.py execution failed"
             echo "Capturing error details..."
             # 重新运行以获取详细错误信息
-            python main.py || true
+            python main.py --initial-crawl || true
             echo "execution-status=failure" >> $GITHUB_OUTPUT
             exit 1
           fi
