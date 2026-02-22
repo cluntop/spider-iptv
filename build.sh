@@ -4,6 +4,14 @@
 
 echo "=== 开始构建 IPTV Spider ==="
 
+# 设置环境变量以禁用 lxml 从源码构建
+export LXML_BUILD_NO_EXTENSIONS=1
+export STATIC_DEPS=true
+
+echo "设置环境变量:"
+echo "LXML_BUILD_NO_EXTENSIONS=$LXML_BUILD_NO_EXTENSIONS"
+echo "STATIC_DEPS=$STATIC_DEPS"
+
 # 创建临时目录
 echo "创建临时目录..."
 mkdir -p temp
@@ -16,17 +24,20 @@ python -m pip install --upgrade pip
 echo "安装 wheel..."
 python -m pip install wheel
 
-# 安装 lxml 的预编译包
+# 安装 lxml 的预编译包 - 强制使用二进制包
 echo "安装 lxml 预编译包..."
-python -m pip install lxml==4.9.4 --only-binary=lxml
+python -m pip install lxml==4.9.4 --only-binary=:all: --no-cache-dir
+
+# 检查 lxml 是否安装成功
+echo "检查 lxml 安装..."
+python -c "import lxml; print('lxml version:', lxml.__version__)"
 
 # 安装其他依赖
 echo "安装项目依赖..."
-python -m pip install -r requirements.txt
+python -m pip install -r requirements.txt --no-cache-dir
 
 # 验证安装
 echo "验证安装..."
-python -c "import lxml; print('lxml version:', lxml.__version__)"
 python -c "import requests; print('requests version:', requests.__version__)"
 python -c "import bs4; print('beautifulsoup4 version:', bs4.__version__)"
 python -c "import psutil; print('psutil version:', psutil.__version__)"
