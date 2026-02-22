@@ -5,19 +5,13 @@ beautifulsoup4==4.12.3
 psutil==5.9.8
 
 # 间接依赖
-#lxml==4.9.4
+# lxml==4.9.4
 urllib3==2.6.3
 idna==3.7
 certifi==2024.7.4
 charset-normalizer==3.3.2
 
-# 安装说明：
-# 1. 首先安装lxml的预编译包：
-pip install lxml==4.9.4 --only-binary=lxml
-# 2. 然后安装其他依赖：
-pip install -r requirements.txt
-
 # 注意：
-# - 必须先安装lxml的预编译包，避免从源码构建
+# - lxml需要单独安装：pip install lxml==4.9.4 --only-binary=lxml
 # - Cloudflare Pages环境缺少libxml2和libxslt开发包
-# - 使用--only-binary=lxml强制使用预编译包
+# - 必须使用预编译的lxml包，避免从源码构建
