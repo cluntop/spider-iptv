@@ -6,31 +6,62 @@
 
 ### 主要功能
 
-- **自动化数据抓取**：支持多种数据源的自动抓取和定期更新
-- **智能频道管理**：自动检测频道质量、速度和可用性
-- **酒店源扫描**：自动扫描和发现酒店IPTV源
-- **组播源处理**：支持组播源的解析和转换
-- **SQLite3数据库**：高效的本地数据库存储
-- **性能优化**：内置性能监控和优化机制
-- **健康检查**：自动数据库健康检查和修复
+- **自动化数据抓取**：支持多种数据源的自动抓取和定期更新，包括网络数据源、酒店源和组播源
+- **智能频道管理**：自动检测频道质量、速度和可用性，支持批量添加和管理
+- **酒店源扫描**：自动扫描和发现酒店IPTV源，支持网络段扫描和质量检测
+- **组播源处理**：支持组播源的解析、转换和udpxy代理管理
+- **SQLite3数据库**：高效的本地数据库存储，支持自动初始化和健康检查
+- **性能优化**：内置性能监控和优化机制，包括内存使用、CPU使用和函数执行时间监控
+- **健康检查**：自动数据库健康检查和修复，包括连接检查、完整性检查和优化
+- **并行处理**：使用线程池和连接池提高处理效率
+- **错误处理**：完善的错误处理和重试机制，提高系统稳定性
+- **调度管理**：智能调度器，支持自定义时间间隔的任务执行
+- **数据源监控**：实时监控数据源状态和更新情况
+- **视频信息解析**：使用FFmpeg解析频道的分辨率、帧率等详细信息
 
 ## 目录结构
 
 ```
 iptv-spider/
-├── src/             # 源代码目录
-│   ├── core/        # 核心功能模块
-│   ├── utils/       # 工具类
-│   ├── services/    # 服务层
-│   ├── models/      # 数据模型
-│   └── config/      # 配置文件
-├── data/            # 数据存储目录
-├── logs/            # 日志目录
-├── scripts/         # 脚本文件
-├── test_system.py   # 系统测试脚本
-├── main.py          # 主程序入口
-├── config.json      # 配置文件
-└── README.md        # 项目文档
+├── src/                  # 源代码目录
+│   ├── core/             # 核心功能模块
+│   │   └── database.py   # 数据库管理
+│   ├── utils/            # 工具类
+│   │   ├── tools.py      # 通用工具
+│   │   ├── performance.py # 性能监控
+│   │   ├── retry/         # 重试机制
+│   │   ├── validators/    # 验证器
+│   │   └── converters/    # 转换器
+│   ├── services/         # 服务层
+│   │   ├── source_service.py    # 数据源服务
+│   │   ├── channel_service.py    # 频道服务
+│   │   ├── hotel_service.py      # 酒店服务
+│   │   ├── multicast_service.py  # 组播服务
+│   │   ├── scheduler.py          # 调度器
+│   │   └── db_health.py          # 数据库健康检查
+│   ├── models/           # 数据模型
+│   ├── controllers/      # 控制器
+│   ├── schemas/          # 数据模式
+│   ├── middlewares/      # 中间件
+│   ├── constants/        # 常量定义
+│   ├── exceptions/       # 异常处理
+│   ├── validators/        # 验证器
+│   ├── providers/         # 数据源提供者
+│   ├── parsers/           # 解析器
+│   ├── generators/        # 生成器
+│   └── config/           # 配置文件
+│       └── config.py      # 配置管理
+├── data/                 # 数据存储目录
+├── logs/                 # 日志目录
+├── scripts/              # 脚本文件
+├── source/               # 数据源文件
+│   ├── download/         # 下载的数据源
+│   ├── hotels/           # 酒店源
+│   └── multicast/        # 组播源
+├── test_system.py        # 系统测试脚本
+├── main.py               # 主程序入口
+├── config.json           # 配置文件
+└── README.md             # 项目文档
 ```
 
 ## 安装说明
@@ -50,7 +81,7 @@ iptv-spider/
 
 1. **克隆项目**
    ```bash
-   git clone https://github.com/yourusername/iptv-spider.git
+   git clone https://github.com/cluntop/iptv-spider.git
    cd iptv-spider
    ```
 
@@ -265,9 +296,9 @@ iptv-spider/
 ### 提交流程
 
 1. **Fork项目**
-2. **创建分支**：`git checkout -b feature/your-feature`
-3. **提交修改**：`git commit -m "Add your feature"`
-4. **推送分支**：`git push origin feature/your-feature`
+2. **创建分支**：`git checkout -b cluntop/spider-iptv`
+3. **提交修改**：`git commit -m "Add your cluntop"`
+4. **推送分支**：`git push origin cluntop/spider-iptv`
 5. **创建Pull Request**
 
 ## 许可证

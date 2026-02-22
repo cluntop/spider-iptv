@@ -3,16 +3,29 @@ import os
 import logging
 import time
 from datetime import datetime
+from threading import RLock
 from src.config.config import config
 
 class DatabaseManager:
-    def __init__(self, db_path=None):
+    _instance = None
+    _lock = RLock()
+    
+    def __new__(cls, db_path=None):
+        with cls._lock:
+            if cls._instance is None:
+                cls._instance = super(DatabaseManager, cls).__new__(cls)
+                cls._instance._initialize(db_path)
+            return cls._instance
+    
+    def _initialize(self, db_path=None):
         self.db_path = db_path or config.get('database.path', 'data/iptv.db')
         self.logger = logging.getLogger(__name__)
-        self._ensure_db_exists()
-        self.retry_count = 0
         self.max_retries = 3
         self.retry_delay = 5  # 秒
+        self._connection_cache = {}
+        self._cache_lock = RLock()
+        self._ensure_db_exists()
+        self._optimize_database()
     
     def _ensure_db_exists(self):
         """确保数据库文件存在并初始化表结构"""
@@ -28,10 +41,7 @@ class DatabaseManager:
         retries = 0
         while retries < self.max_retries:
             try:
-                with sqlite3.connect(self.db_path) as conn:
-                    conn.execute("PRAGMA foreign_keys = ON")
-                    conn.execute("PRAGMA journal_mode = WAL")
-                    conn.execute("PRAGMA synchronous = NORMAL")
+                with self.get_connection() as conn:
                     self._create_tables(conn)
                     self.logger.info(f"数据库初始化成功: {self.db_path}")
                     return
@@ -47,6 +57,27 @@ class DatabaseManager:
             except Exception as e:
                 self.logger.error(f"数据库初始化异常: {e}")
                 raise
+    
+    def _optimize_database(self):
+        """优化数据库配置"""
+        try:
+            with self.get_connection() as conn:
+                # 启用外键约束
+                conn.execute("PRAGMA foreign_keys = ON")
+                # 使用WAL模式提高并发性能
+                conn.execute("PRAGMA journal_mode = WAL")
+                # 设置同步模式为NORMAL，平衡性能和安全性
+                conn.execute("PRAGMA synchronous = NORMAL")
+                # 设置缓存大小为10MB
+                conn.execute("PRAGMA cache_size = -10000")
+                # 设置页大小为4KB
+                conn.execute("PRAGMA page_size = 4096")
+                # 分析数据库以优化查询计划
+                conn.execute("PRAGMA analysis_limit = 400")
+                conn.execute("PRAGMA optimize")
+                self.logger.info("数据库优化完成")
+        except Exception as e:
+            self.logger.error(f"数据库优化失败: {e}")
     
     def _create_tables(self, conn):
         """创建数据库表结构"""
@@ -132,9 +163,11 @@ class DatabaseManager:
         # 创建索引以提高查询性能
         cursor.execute('CREATE INDEX IF NOT EXISTS idx_channels_name ON iptv_channels (name)')
         cursor.execute('CREATE INDEX IF NOT EXISTS idx_channels_sign ON iptv_channels (sign)')
+        cursor.execute('CREATE INDEX IF NOT EXISTS idx_channels_speed ON iptv_channels (speed)')
         cursor.execute('CREATE INDEX IF NOT EXISTS idx_hotels_ip ON iptv_hotels (ip)')
         cursor.execute('CREATE INDEX IF NOT EXISTS idx_hotels_status ON iptv_hotels (status)')
         cursor.execute('CREATE INDEX IF NOT EXISTS idx_multicast_isp ON iptv_multicast (isp)')
+        cursor.execute('CREATE INDEX IF NOT EXISTS idx_multicast_status ON iptv_multicast (status)')
         cursor.execute('CREATE INDEX IF NOT EXISTS idx_udpxy_mid ON iptv_udpxy (mid)')
         cursor.execute('CREATE INDEX IF NOT EXISTS idx_udpxy_status ON iptv_udpxy (status)')
         
@@ -142,6 +175,19 @@ class DatabaseManager:
     
     def get_connection(self):
         """获取数据库连接"""
+        thread_id = os.getpid()
+        
+        with self._cache_lock:
+            if thread_id in self._connection_cache:
+                conn = self._connection_cache[thread_id]
+                try:
+                    # 测试连接是否有效
+                    conn.execute("SELECT 1")
+                    return conn
+                except sqlite3.Error:
+                    # 连接无效，删除并重新创建
+                    del self._connection_cache[thread_id]
+        
         retries = 0
         while retries < self.max_retries:
             try:
@@ -149,6 +195,10 @@ class DatabaseManager:
                 conn.row_factory = sqlite3.Row  # 启用字典式游标
                 conn.execute("PRAGMA foreign_keys = ON")
                 conn.execute("PRAGMA busy_timeout = 30000")  # 30秒忙等待
+                
+                with self._cache_lock:
+                    self._connection_cache[thread_id] = conn
+                
                 return conn
             except sqlite3.Error as e:
                 retries += 1
@@ -249,10 +299,50 @@ class DatabaseManager:
                 self.logger.error(f"查询执行异常: {query}, {params}, {e}")
                 raise
     
+    def vacuum(self):
+        """执行VACUUM操作优化数据库"""
+        try:
+            with self.get_connection() as conn:
+                conn.execute("VACUUM")
+                self.logger.info("数据库VACUUM操作完成")
+        except Exception as e:
+            self.logger.error(f"数据库VACUUM操作失败: {e}")
+    
     def close(self):
-        """关闭数据库连接"""
-        # SQLite连接在with语句结束时自动关闭
-        pass
+        """关闭所有数据库连接"""
+        with self._cache_lock:
+            for thread_id, conn in self._connection_cache.items():
+                try:
+                    conn.close()
+                except Exception as e:
+                    self.logger.error(f"关闭数据库连接失败: {e}")
+            self._connection_cache.clear()
+    
+    def get_db_info(self):
+        """获取数据库信息"""
+        try:
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                # 获取数据库文件大小
+                db_size = os.path.getsize(self.db_path)
+                
+                # 获取表信息
+                tables = []
+                cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")
+                for table in cursor.fetchall():
+                    table_name = table[0]
+                    cursor.execute(f"SELECT COUNT(*) FROM {table_name}")
+                    count = cursor.fetchone()[0]
+                    tables.append({"name": table_name, "count": count})
+                
+                return {
+                    "path": self.db_path,
+                    "size": db_size,
+                    "tables": tables
+                }
+        except Exception as e:
+            self.logger.error(f"获取数据库信息失败: {e}")
+            return None
 
 # 全局数据库管理器实例
 db_manager = None
