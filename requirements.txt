@@ -4,9 +4,5 @@ requests==2.31.0
 beautifulsoup4==4.12.3
 psutil==5.9.8
 
-# 间接依赖
-lxml==4.9.4  # beautifulsoup4的依赖
-urllib3==2.2.1  # requests的依赖
-idna==3.6  # requests的依赖
-certifi==2024.2.2  # requests的依赖
-charset-normalizer==3.3.2  # requests的依赖
+# 使用预编译的lxml轮询包，避免从源码构建
+lxml==4.9.4
