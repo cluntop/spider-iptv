@@ -4,5 +4,16 @@ requests==2.31.0
 beautifulsoup4==4.12.3
 psutil==5.9.8
 
-# 使用预编译的lxml轮询包，避免从源码构建
+# 间接依赖
 lxml==4.9.4
+urllib3==2.2.1
+idna==3.6
+certifi==2024.2.2
+charset-normalizer==3.3.2
+
+# 安装说明：
+# 1. 对于Linux系统，需要先安装系统依赖：
+#    sudo apt-get update && sudo apt-get install -y libxml2-dev libxslt1-dev zlib1g-dev
+# 2. 升级pip：pip install --upgrade pip
+# 3. 清理缓存：pip cache purge
+# 4. 安装依赖：pip install -r requirements.txt
