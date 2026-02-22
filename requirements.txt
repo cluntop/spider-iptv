@@ -1,6 +1,6 @@
 # 项目依赖清单
 # 直接依赖
-requests==2.31.0
+requests==2.32.4
 beautifulsoup4==4.12.3
 psutil==5.9.8
 
