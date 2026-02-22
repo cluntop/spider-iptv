@@ -65,7 +65,7 @@ jobs:
           fi
         env:
           NODE_ENV: production
-          BUILD_MODE: ${{ github.ref == 'refs/heads/main' ? 'production' : 'staging' }}
+          BUILD_MODE: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
           CI: true
 
       - name: Upload build artifacts
@@ -200,7 +200,7 @@ jobs:
           projectName: iptv-spider-staging
           directory: dist
           branch: staging
-          environment: staging
+          # environment: staging  # 移除无效参数，cloudflare/pages-action@v1 不支持 environment 输入
 
       - name: Notify deployment status
         if: success()
@@ -231,7 +231,7 @@ jobs:
           projectName: spider-iptv
           directory: dist
           branch: main
-          environment: production
+          # environment: production  # cloudflare/pages-action@v1 不支持 environment 输入，已移除
 
       - name: Notify deployment status
         if: success()
