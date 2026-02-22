@@ -66,3 +66,4 @@ archive/
 pnpm-lock.yaml
 
 .trae
+.wrangler

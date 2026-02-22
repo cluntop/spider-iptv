@@ -1,5 +1,7 @@
 // Cloudflare Pages 登出函数
-export async function onRequest(context) {
+import { withCors } from '../../utils/cors.js';
+
+async function handler(context) {
   const { request, env, params, waitUntil } = context;
   
   if (request.method !== 'POST') {
@@ -19,8 +21,7 @@ export async function onRequest(context) {
     return new Response(
       JSON.stringify({
         success: true,
-        message: 'Logout successful',
-        timestamp: new Date().toISOString()
+        message: 'Logout successful'
       }),
       {
         headers: {
@@ -38,3 +39,6 @@ export async function onRequest(context) {
     );
   }
 }
+
+// Export wrapped handler with CORS support
+export const onRequest = withCors(handler);

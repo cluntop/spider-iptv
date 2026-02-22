@@ -7,4 +7,6 @@
 /entry/* /entry/:splat 200
 
 # 单页应用路由 - 重定向到 index.html
-/* /index.html 200
+# 避免无限循环警告的写法
+# 禁用服务器自动去除 .html 和 /index 后缀的行为
+/* /index.html 200!

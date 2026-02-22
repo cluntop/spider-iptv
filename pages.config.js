@@ -9,7 +9,7 @@ module.exports = {
   // 构建命令
   buildCommand: `cd frontend && npm install && npm run build:${isProduction ? 'production' : isStaging ? 'staging' : 'staging'}`,
   // 构建输出目录
-  outputDirectory: 'dist',
+  outputDirectory: 'frontend/dist',
   // 环境变量
   env: {
     NODE_VERSION: '18',
@@ -24,8 +24,8 @@ module.exports = {
     VITE_APP_DEBUG: isProduction ? 'false' : 'true',
     VITE_APP_TITLE: isProduction ? 'IPTV 管理系统' : 'IPTV 管理系统 (Staging)',
     VITE_APP_DOMAIN: isProduction 
-      ? 'https://your-production-domain.pages.dev' 
-      : 'https://your-staging-domain.pages.dev'
+      ? 'https://spider-iptv.pages.dev' 
+      : 'https://spider-iptv-staging.pages.dev'
   },
   // 构建配置
   build: {

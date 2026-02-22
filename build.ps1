@@ -63,9 +63,9 @@ python -c "import psutil; print('psutil version:', psutil.__version__)"
 
 # 3. Copy Cloudflare Functions
 Write-Host "\n=== Copying Cloudflare Functions ==="
-if (Test-Path "_pages\functions") {
+if (Test-Path "functions") {
     New-Item -ItemType Directory -Path "dist\functions" -Force | Out-Null
-    Get-ChildItem -Path "_pages\functions" -Recurse | Copy-Item -Destination "dist\functions" -Force
+    Get-ChildItem -Path "functions" -Recurse | Copy-Item -Destination "dist\functions" -Force
 } else {
     Write-Host "No functions directory to copy"
 }
