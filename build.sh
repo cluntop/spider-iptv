@@ -4,6 +4,27 @@
 
 echo "=== 开始构建 IPTV Spider ==="
 
+# 1. 构建前端
+echo "\n=== 构建前端 ==="
+cd frontend
+
+# 安装 Node.js 依赖
+echo "安装前端依赖..."
+npm install
+
+# 构建前端
+echo "构建前端应用..."
+npm run build
+
+# 复制前端构建输出到根目录的 dist 文件夹
+echo "复制前端构建输出..."
+cd ..
+mkdir -p dist
+cp -r frontend/dist/* dist/
+
+# 2. 构建后端
+echo "\n=== 构建后端 ==="
+
 # 设置环境变量以禁用 lxml 从源码构建
 export LXML_BUILD_NO_EXTENSIONS=1
 export STATIC_DEPS=true
@@ -42,24 +63,45 @@ python -c "import requests; print('requests version:', requests.__version__)"
 python -c "import bs4; print('beautifulsoup4 version:', bs4.__version__)"
 python -c "import psutil; print('psutil version:', psutil.__version__)"
 
-# 创建构建输出目录
-echo "创建构建输出目录..."
-mkdir -p dist
+# 3. 复制 Cloudflare Functions
+echo "\n=== 复制 Cloudflare Functions ==="
+cp -r _pages/functions dist/functions 2>/dev/null || echo "No functions directory to copy"
+cp -r _pages/_headers dist/ 2>/dev/null || echo "No _headers file to copy"
+cp -r _pages/_redirects dist/ 2>/dev/null || echo "No _redirects file to copy"
 
-# 复制必要文件到输出目录
-echo "复制文件到输出目录..."
-cp -r src dist/
+# 4. 复制必要的后端文件
+echo "\n=== 复制后端文件 ==="
+mkdir -p dist/src
+echo "复制后端代码..."
+cp -r src/* dist/src/
 cp main.py dist/
-cp config.json dist/
 cp requirements.txt dist/
 cp README.md dist/
 
-# 创建构建信息文件
-echo "创建构建信息..."
+# 5. 创建构建信息文件
+echo "\n=== 创建构建信息 ==="
 echo "Build completed at: $(date)" > dist/BUILD_INFO.txt
+echo "Frontend build: $(cat frontend/package.json | grep version | head -1 | cut -d '"' -f 4)" >> dist/BUILD_INFO.txt
+echo "Python backend: $(python -c 'import sys; print(sys.version)')" >> dist/BUILD_INFO.txt
 
-# 清理临时文件
-echo "清理临时文件..."
+# 6. 清理临时文件
+echo "\n=== 清理临时文件 ==="
 rm -rf temp
 
-echo "=== 构建完成 ==="
+# 7. 验证构建输出
+echo "\n=== 验证构建输出 ==="
+echo "构建输出目录结构:"
+ls -la dist/
+if [ -d "dist/functions" ]; then
+    echo "\nCloudflare Functions:"
+    ls -la dist/functions/
+fi
+
+if [ -d "dist/static" ]; then
+    echo "\n前端静态资源:"
+    ls -la dist/static/
+fi
+
+echo "\n=== 构建完成 ==="
+echo "构建输出目录: $(pwd)/dist"
+echo "\n下一步: 部署到 Cloudflare Pages 或其他平台"

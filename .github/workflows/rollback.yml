@@ -43,14 +43,15 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           projectName: iptv-spider${{ github.event.inputs.environment == 'staging' ? '-staging' : '' }}
-          directory: dist
-          branch: ${{ github.event.inputs.environment }}
-          environment: ${{ github.event.inputs.environment }}
+          directory: frontend/dist
+          branch: ${{ github.event.inputs.environment == 'production' && 'main' || github.event.inputs.environment }}
 
       - name: Notify rollback completion
+
         if: success()
         run: |
           echo "Rollback to ${{ github.event.inputs.environment }} completed successfully!"
+
           echo "Deployment URL: https://iptv-spider${{ github.event.inputs.environment == 'staging' ? '-staging' : '' }}.pages.dev"
 
       - name: Notify rollback failure

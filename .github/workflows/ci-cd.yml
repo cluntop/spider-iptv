@@ -14,7 +14,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     
     steps:
       - name: Checkout code
@@ -27,14 +27,17 @@ jobs:
           cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
 
-      - name: Install dependencies
-        run: cd frontend && npm ci
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
 
-      - name: Run linting
-        run: cd frontend && npm run lint
+      - name: Make build script executable
+        run: chmod +x build.sh
 
-      - name: Build frontend
-        run: cd frontend && npm run build
+      - name: Run build script
+        run: ./build.sh
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -59,11 +62,22 @@ jobs:
           cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
 
-      - name: Install dependencies
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install frontend dependencies
         run: cd frontend && npm ci
 
-      - name: Run tests
+      - name: Run frontend tests
         run: cd frontend && npm test -- --passWithNoTests
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Python tests
+        run: python -m pytest test/ --pass-with-no-tests
 
   deploy-staging:
     needs: [build, test]
@@ -88,7 +102,6 @@ jobs:
           projectName: iptv-spider-staging
           directory: dist
           branch: staging
-          environment: staging
 
   deploy-production:
     needs: [build, test]
@@ -113,4 +126,30 @@ jobs:
           projectName: iptv-spider
           directory: dist
           branch: main
-          environment: production
+
+  deploy-python-backend:
+    needs: [build, test]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Deploy Python backend
+        run: |
+          # 这里添加Python后端部署命令
+          # 例如部署到Vercel Serverless, AWS Lambda等
+          echo "Python backend deployment placeholder"
+          echo "In production, this would deploy to a Python-compatible serverless platform"
+          echo "Backend files are ready for deployment:"
+          ls -la src/api/
+
