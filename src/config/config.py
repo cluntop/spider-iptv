@@ -33,6 +33,26 @@ class Config:
                         "enabled": True
                     },
                     {
+                        "name": "北京联通",
+                        "url": "https://iptv.im2k.com/bjuc.m3u",
+                        "enabled": True
+                    },
+                    {
+                        "name": "北京移动",
+                        "url": "https://iptv.im2k.com/bjm.m3u",
+                        "enabled": True
+                    },
+                    {
+                        "name": "天津联通",
+                        "url": "https://iptv.im2k.com/tjuc.m3u",
+                        "enabled": True
+                    },
+                    {
+                        "name": "天津移动",
+                        "url": "https://iptv.im2k.com/tjm.m3u",
+                        "enabled": True
+                    },
+                    {
                         "name": "m3u_ibert",
                         "url": "https://m3u.ibert.me/",
                         "enabled": True
