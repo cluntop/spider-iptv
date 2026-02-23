@@ -10,21 +10,21 @@ API_URL = "https://tv.clun.top"
 
 [build]
 command = "npm run build" # 构建指令
-watch_dir = "/src"        # 本地开发监听目录
+watch_dir = "./src"        # 本地开发监听目录
 
 # 绑定 KV 命名空间
-[[kv_namespaces]]
+#[[kv_namespaces]]
 #binding = "MY_KV"
 #id = "xxxxxxxxxxxxxx"
 
 # 绑定 D1 数据库
-[[d1_databases]]
+#[[d1_databases]]
 #binding = "DB"
 #database_name = "prod-db"
 #database_id = "xxxxxxxxxxxxxx"
 
 # 绑定 R2 存储桶
-[[r2_buckets]]
+#[[r2_buckets]]
 #binding = "BUCKET"
 #bucket_name = "my-assets"
 
@@ -32,8 +32,8 @@ watch_dir = "/src"        # 本地开发监听目录
 [env.preview.vars]
 API_URL = "https://tv.clun.top"
 
-[env.preview]
-[[d1_databases]]
+#[env.preview]
+#[[d1_databases]]
 #binding = "DB"
 #database_name = "preview-db"
 #database_id = "yyyyyyyyyyyyyy"
