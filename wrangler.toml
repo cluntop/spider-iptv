@@ -8,9 +8,9 @@ compatibility_date = "2026-02-23" # 使用当前的兼容性日期
 API_URL = "https://tv.clun.top"
 #NODE_VERSION = "24.0.0"
 
-[build]
-command = "npm run build" # 构建指令
-watch_dir = "./src"        # 本地开发监听目录
+#[build]
+#command = "npm run build" # 构建指令
+#watch_dir = "./src"        # 本地开发监听目录
 
 # 绑定 KV 命名空间
 #[[kv_namespaces]]
