@@ -1,6 +1,6 @@
 #:schema node_modules/wrangler/config-schema.json
 name = "spider-iptv"
-pages_build_output_dir = "./dist" # 构建后的静态文件目录（如 Vite 为 ./dist, Next.js 为 ./out）
+pages_build_output_dir = "./" # 构建后的静态文件目录（如 Vite 为 ./dist, Next.js 为 ./out）
 compatibility_date = "2026-02-23" # 使用当前的兼容性日期
 
 [vars]
