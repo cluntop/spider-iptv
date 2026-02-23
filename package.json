@@ -1,11 +1,11 @@
 {
-  "name": "iptv-spider",
+  "name": "spider-iptv",
   "version": "1.0.0",
-  "description": "IPTV爬虫项目，用于自动抓取、管理和优化IPTV直播源",
+  "description": "IPTV",
   "main": "index.js",
   "scripts": {
-    "build": "echo '=== 开始构建 IPTV Spider ===' && python -m pip install --upgrade pip && python -m pip install wheel && python -m pip install lxml --only-binary=lxml && python -m pip install -r requirements.txt && echo '=== 构建完成 ==='",
-    "test": "python test_system.py",
+    "build": "python -m pip install --upgrade pip && python -m pip install wheel && python -m pip install lxml --only-binary=lxml",
+    "test": "python main.py",
     "start": "python main.py"
   },
   "keywords": [
@@ -18,7 +18,7 @@
   "license": "MIT",
   "engines": {
     "node": ">=16.0.0",
-    "python": ">=3.7.0"
+    "python": ">=3.13.3"
   },
   "dependencies": {},
   "devDependencies": {}
