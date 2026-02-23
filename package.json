@@ -4,7 +4,7 @@
   "description": "IPTV",
   "main": "index.js",
   "scripts": {
-    "build": "python -m pip install --upgrade pip && python -m pip install wheel && python -m pip install lxml --only-binary=lxml && python main.py",
+    "build": "python -m pip install --upgrade pip && python -m pip install wheel && python -m pip install lxml --only-binary=lxml && python main.py --initial-crawl",
     "test": "python main.py",
     "start": "python main.py"
   },
